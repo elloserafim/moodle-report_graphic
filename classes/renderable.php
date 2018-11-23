@@ -83,14 +83,13 @@ class report_graphic_renderable implements renderable {
         $courses = array();
         $sitecontext = context_system::instance();
         // First check to see if we can override showcourses and showusers.
-        $numcourses = $DB->count_records("course");
+        $numcourses = $DB->count_records("course", array('visible' => '1'));
         if ($numcourses < COURSE_MAX_COURSES_PER_DROPDOWN && !$this->showcourses) {
             $this->showcourses = 1;
         }
-
         // Check if course filter should be shown.
         if ($this->showcourses) {
-            if ($courserecords = $DB->get_records("course", null, "fullname", "id,shortname,fullname,category")) {
+            if ($courserecords = $DB->get_records("course", array('visible' => '1'), "fullname", "id,shortname,fullname,category")) {
                 foreach ($courserecords as $course) {
                     if ($course->id == SITEID) {
                         $courses[$course->id] = format_string($course->fullname) . ' (' . get_string('site') . ')';
@@ -103,6 +102,42 @@ class report_graphic_renderable implements renderable {
         }
         return $courses;
     }
+
+    public function get_categories_list($parent = 0, $keys = false) {
+        global $DB;
+
+        $courses = array();
+        $sitecontext = context_system::instance();
+
+
+            if ($courserecords = $DB->get_records("course_categories", array('parent' => $parent), "name", "id,name")) {
+                if($keys){
+                    foreach ($courserecords as $course) {
+                        $courses[$course->id] = format_string($course->name);
+                    }
+                }
+                else{
+                    foreach ($courserecords as $course) {
+                        $courses[] = $course;
+                    }
+                    //core_collator::asort($courserecords);
+                    return $courses;
+                }
+
+            }
+        return $courses;
+    }
+
+    public function get_courses($category){
+        global $DB;
+        $courses = $DB->get_records('course', array('category' => $category), 'fullname', 'id, fullname');
+        $return = array();
+        foreach ($courses as $course){
+            $return[] = $course;
+        }
+        return $return;
+    }
+
 
     /**
      * Displays course related graph charts.
@@ -120,11 +155,24 @@ class report_graphic_renderable implements renderable {
         $this->activitybyperiod = $graphreport->get_monthly_user_activity();
     }
 
+    public function get_gcharts_data_info() {
+        $graphreport = new report_graphic($this->course->id);
+
+        // User Activity Pie Chart.
+        $this->mostactiveusers = $graphreport->get_most_active_users_data();
+
+        // Most triggered events. rename this attr
+        $this->mosttriggeredevents = $graphreport->get_most_triggered_events_data();
+
+        // Monthly user activity.
+        $this->activitybyperiod = $graphreport->get_monthly_user_activity_data();
+    }
+
     /**
      * Displays site related charts.
      */
-    public function get_courses_activity() {
+    public function get_courses_activity($category, $forcechart, $activeonly) {
         $graphreport = new report_graphic();
-        $this->mostactivecourses = $graphreport->get_courses_activity();
+        $this->mostactivecourses = $graphreport->get_category_activity($category, $forcechart, $activeonly);
     }
 }

@@ -67,7 +67,7 @@ class Gcharts
 	public $filter_div			= NULL;
 	public $class_filter_div	= NULL;
 	public $chart_div			= NULL;
-	public $class_chart_div		= NULL;
+	public $class_chart_div		= 'chart';
 	public $open_js_tag			= TRUE;
 	public $graphic_type 		= 'LineChart'; //LineChart,PieChart,ColumnChart,AreaChart,TreeMap,ScatterChart,Gauge,GeoChart,ComboChart,BarChart,CandlestickChart,Table
 	public $control_type		= 'NumberRangeFilter';

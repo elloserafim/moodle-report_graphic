@@ -24,7 +24,6 @@
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->dirroot . '/course/lib.php');
-
 require_login();
 admin_externalpage_setup('report_graphic');
 $context = context_system::instance();
@@ -40,4 +39,7 @@ $renderable = new report_graphic_renderable();
 $renderer = $PAGE->get_renderer('report_graphic');
 echo $renderer->render($renderable);
 echo $renderer->report_course_activity_chart();
+$PAGE->requires->js(new moodle_url('https://www.gstatic.com/charts/loader.js'));
+$PAGE->requires->js(new moodle_url('/report/graphic/js/select.js'));
+
 echo $OUTPUT->footer();

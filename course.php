@@ -29,7 +29,7 @@ require_login();
 
 $context = context_system::instance();
 require_capability('report/graphic:view', $context);
-$courseid = required_param('id', 'int');
+$courseid = required_param('courseid', PARAM_INT);
 if (!$course = get_course($courseid)) {
     print_error('nocourseid');
 }
@@ -45,4 +45,6 @@ $renderable = new report_graphic_renderable($course);
 $renderer = $PAGE->get_renderer('report_graphic');
 echo $renderer->render($renderable);
 echo $renderer->report_generate_charts();
+
+
 echo $OUTPUT->footer();
